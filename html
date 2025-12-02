@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TMV Retirement Question Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #020617;
+      color: #e5e7eb;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 16px 0;
+      font-size: 26px;
+      letter-spacing: 0.03em;
+    }
+
+    p.subtitle {
+      margin: 0 0 24px 0;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .card {
+      background: #020617;
+      border-radius: 14px;
+      border: 1px solid #1e293b;
+      padding: 18px 20px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.7);
+    }
+
+    .controls {
+      flex: 0 0 290px;
+      max-width: 340px;
+    }
+
+    .output {
+      flex: 1 1 0;
+      min-width: 280px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #e5e7eb;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: #9ca3af;
+    }
+
+    .field input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 14px;
+    }
+
+    .field input[type="number"]::placeholder {
+      color: #6b7280;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+      color: #022c22;
+      margin-top: 4px;
+      transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.06s ease;
+      box-shadow: 0 12px 25px rgba(34, 197, 94, 0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.02);
+      box-shadow: 0 16px 30px rgba(34, 197, 94, 0.35);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 10px 20px rgba(34, 197, 94, 0.25);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.08s ease, transform 0.06s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #020617;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .question-block {
+      margin-top: 4px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.08), transparent 60%);
+      border: 1px solid #1e293b;
+      font-size: 14px;
+      line-height: 1.5;
+      max-height: 340px;
+      overflow: auto;
+    }
+
+    .question-block strong {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    .question-block ul {
+      padding-left: 18px;
+      margin: 8px 0 6px 0;
+    }
+
+    .question-block li {
+      margin-bottom: 4px;
+    }
+
+    .solution-block {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px dashed #1f2937;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .pill {
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .empty-state {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 800px) {
+      .page {
+        padding: 16px;
+      }
+      .controls,
+      .output {
+        max-width: 100%;
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>TMV Retirement Question Generator</h1>
+      <p class="subtitle">
+        Generates time value of money practice questions with one time cash flows and a fixed retirement wealth target.
+      </p>
+    </header>
+
+    <div class="layout">
+      <section class="card controls">
+        <div class="section-title">Settings</div>
+
+        <div class="field">
+          <label for="numEvents">Number of events</label>
+          <input
+            id="numEvents"
+            type="number"
+            min="1"
+            max="6"
+            value="3"
+          />
+          <div class="hint">
+            Each event is a single cash flow like a big purchase or a windfall.
+          </div>
+        </div>
+
+        <button id="generateBtn" class="btn-primary">
+          Generate new question
+        </button>
+
+        <div class="pill-row">
+          <div class="pill" id="agePill">Age range: n a</div>
+          <div class="pill" id="ratePill">Return: n a</div>
+          <div class="pill" id="horizonPill">Years to retirement: n a</div>
+        </div>
+      </section>
+
+      <section class="card output">
+        <div class="section-title">Current question</div>
+
+        <div id="questionText" class="question-block">
+          Click the button on the left to generate your first scenario.
+        </div>
+
+        <button id="toggleSolutionBtn" class="btn-secondary" disabled>
+          Show solution
+        </button>
+
+        <div id="solutionText" class="solution-block" style="display: none;"></div>
+
+        <div class="empty-state">
+          Use the solution section as a model answer. You can rewrite it in your own style and recompute the numbers by hand or on a calculator.
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function formatCurrency(amount) {
+      return amount.toLocaleString("en-CA", {
+        style: "currency",
+        currency: "CAD",
+        maximumFractionDigits: 0
+      });
+    }
+
+    const positiveLabels = [
+      "a small lottery win",
+      "an inheritance",
+      "selling a side business",
+      "a retention bonus",
+      "a gift from family",
+      "a profit from investment"
+    ];
+
+    const negativeLabels = [
+      "buying a home",
+      "paying for grad school",
+      "buying a new car",
+      "a long vacation",
+      "a medical bill",
+      "a wedding"
+    ];
+
+    let lastScenario = null;
+
+    function generateScenario() {
+      const numEventsInput = document.getElementById("numEvents");
+
+      let numEvents = parseInt(numEventsInput.value, 10);
+      if (isNaN(numEvents) || numEvents < 1) numEvents = 1;
+      if (numEvents > 6) numEvents = 6;
+
+      const currentAge = randomInt(25, 40);
+      const retirementAge = randomInt(60, 70);
+      const yearsToRetirement = retirementAge - currentAge;
+
+      const ratePercent = randomInt(3, 7);
+      const rate = ratePercent / 100;
+
+      const events = [];
+      let totalFutureValue = 0;
+
+      for (let i = 0; i < numEvents; i++) {
+        const age = randomInt(currentAge + 1, retirementAge - 1);
+
+        const isPositive = i % 2 === 0;
+        let baseAmount;
+        let label;
+
+        if (isPositive) {
+          baseAmount = randomInt(50, 300) * 1000;
+          label = positiveLabels[randomInt(0, positiveLabels.length - 1)];
+        } else {
+          baseAmount = randomInt(20, 200) * 1000;
+          label = negativeLabels[randomInt(0, negativeLabels.length - 1)];
+        }
+
+        const amount = isPositive ? baseAmount : -baseAmount;
+        const yearsToRetFromEvent = retirementAge - age;
+        const fvAtRetirement = amount * Math.pow(1 + rate, yearsToRetFromEvent);
+
+        totalFutureValue += fvAtRetirement;
+
+        events.push({
+          index: i + 1,
+          age: age,
+          amount: amount,
+          label: label,
+          fvAtRetirement: fvAtRetirement
+        });
+      }
+
+      if (totalFutureValue <= 0) {
+        return generateScenario();
+      }
+
+      const requiredFactor = 0.7 + Math.random() * 0.6;
+      const requiredCapitalRaw = totalFutureValue * requiredFactor;
+      const requiredCapital = Math.round(requiredCapitalRaw / 1000) * 1000;
+
+      const difference = totalFutureValue - requiredCapital;
+      const shortfall = requiredCapital > totalFutureValue ? requiredCapital - totalFutureValue : 0;
+      const lumpSumTodayNeeded = shortfall > 0 ? shortfall / Math.pow(1 + rate, yearsToRetirement) : 0;
+
+      lastScenario = {
+        currentAge: currentAge,
+        retirementAge: retirementAge,
+        yearsToRetirement: yearsToRetirement,
+        ratePercent: ratePercent,
+        rate: rate,
+        requiredCapital: requiredCapital,
+        events: events,
+        totalFutureValue: totalFutureValue,
+        difference: difference,
+        shortfall: shortfall,
+        lumpSumTodayNeeded: lumpSumTodayNeeded
+      };
+
+      renderQuestion();
+      clearSolution();
+      updatePills();
+    }
+
+    function renderQuestion() {
+      const qDiv = document.getElementById("questionText");
+
+      if (!lastScenario) {
+        qDiv.textContent = "No scenario yet.";
+        return;
+      }
+
+      const s = lastScenario;
+
+      const eventListHtml = s.events
+        .map(ev => {
+          if (ev.amount > 0) {
+            return `<li><strong>Event ${ev.index}</strong>: At age ${ev.age} you receive ${formatCurrency(ev.amount)} from ${ev.label}.</li>`;
+          } else {
+            return `<li><strong>Event ${ev.index}</strong>: At age ${ev.age} you spend ${formatCurrency(Math.abs(ev.amount))} on ${ev.label}.</li>`;
+          }
+        })
+        .join("");
+
+      const html = `
+        You are currently <strong>${s.currentAge}</strong> years old and you plan to retire at age <strong>${s.retirementAge}</strong>.
+        You expect your investments to earn <strong>${s.ratePercent} percent</strong> per year with yearly compounding.
+        <br><br>
+        You have calculated that you need <strong>${formatCurrency(s.requiredCapital)}</strong> in your investment account on your retirement date to fund your retirement lifestyle.
+        <br><br>
+        Between now and retirement the following one time cash flows happen:
+        <ul>
+          ${eventListHtml}
+        </ul>
+        Assume every amount you receive is invested at ${s.ratePercent} percent per year until retirement and every amount you spend is withdrawn from the same account.
+        <br><br>
+        Tasks for the student:
+        <ol>
+          <li>Compute the future value at retirement of each cash flow.</li>
+          <li>Find the total value of the account at retirement if you start today with zero.</li>
+          <li>Decide whether you reach the target of ${formatCurrency(s.requiredCapital)}. If not, state the surplus or shortfall.</li>
+          <li>If there is a shortfall, find the single deposit you would need to invest today at age ${s.currentAge} to exactly reach the target at retirement.</li>
+        </ol>
+      `;
+
+      qDiv.innerHTML = html;
+
+      const toggleBtn = document.getElementById("toggleSolutionBtn");
+      toggleBtn.disabled = false;
+    }
+
+    function clearSolution() {
+      const solDiv = document.getElementById("solutionText");
+      solDiv.style.display = "none";
+      solDiv.innerHTML = "";
+      const toggleBtn = document.getElementById("toggleSolutionBtn");
+      toggleBtn.textContent = "Show solution";
+    }
+
+    function renderSolution() {
+      if (!lastScenario) {
+        return;
+      }
+
+      const s = lastScenario;
+      const solDiv = document.getElementById("solutionText");
+
+      const eventsListHtml = s.events
+        .map(ev => {
+          const signText = ev.amount > 0 ? "deposit" : "withdrawal";
+          return `<li>Event ${ev.index} (${signText} at age ${ev.age}): future value at retirement = ${formatCurrency(ev.fvAtRetirement)}.</li>`;
+        })
+        .join("");
+
+      const absDiff = Math.abs(s.difference);
+      const outcomeDescription =
+        s.difference >= 0
+          ? `You reach the target and have a surplus of about <strong>${formatCurrency(absDiff)}</strong> at retirement.`
+          : `You do not reach the target. You are short by about <strong>${formatCurrency(absDiff)}</strong> at retirement.`;
+
+      const lumpText =
+        s.shortfall > 0
+          ? `To close this gap you would need a single deposit today of about <strong>${formatCurrency(s.lumpSumTodayNeeded)}</strong> at age ${s.currentAge}.`
+          : "You do not need any extra deposit today to meet the target.";
+
+      const html = `
+        <strong>Future value by event</strong>
+        <ul>
+          ${eventsListHtml}
+        </ul>
+        <strong>Total at retirement</strong><br>
+        Sum of all event values at retirement: <strong>${formatCurrency(s.totalFutureValue)}</strong><br>
+        Target wealth at retirement: <strong>${formatCurrency(s.requiredCapital)}</strong><br>
+        Difference (total minus target): <strong>${formatCurrency(s.difference)}</strong><br>
+        ${outcomeDescription}
+        <br><br>
+        ${lumpText}
+        <br><br>
+        <strong>How to solve by hand</strong><br>
+        1. For each event grow the cash flow forward from its age to the retirement age at ${s.ratePercent} percent per year.<br>
+        2. Add these values to get the account balance at retirement.<br>
+        3. Compare this balance with the target wealth to find the surplus or shortfall.<br>
+        4. If there is a shortfall, discount that gap back from retirement to today at the same rate to find the required lump sum deposit today.
+      `;
+
+      solDiv.innerHTML = html;
+      solDiv.style.display = "block";
+    }
+
+    function updatePills() {
+      if (!lastScenario) return;
+      const s = lastScenario;
+
+      const agePill = document.getElementById("agePill");
+      const ratePill = document.getElementById("ratePill");
+      const horizonPill = document.getElementById("horizonPill");
+
+      agePill.textContent =
+        "Age range: " + s.currentAge + " to " + s.retirementAge;
+      ratePill.textContent =
+        "Return: " + s.ratePercent + " percent yearly";
+      horizonPill.textContent =
+        "Years to retirement: " + s.yearsToRetirement;
+    }
+
+    document.getElementById("generateBtn").addEventListener("click", generateScenario);
+
+    document
+      .getElementById("toggleSolutionBtn")
+      .addEventListener("click", () => {
+        const solDiv = document.getElementById("solutionText");
+        if (solDiv.style.display === "none" || solDiv.style.display === "") {
+          renderSolution();
+          document.getElementById("toggleSolutionBtn").textContent =
+            "Hide solution";
+        } else {
+          clearSolution();
+        }
+      });
+  </script>
+</body>
+</html>
